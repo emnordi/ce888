@@ -35,13 +35,15 @@ class Utils:
       return (indices, missclass_clusters)
 
     """
-    Predicts the amount of clusters for a dataset using the silhouette method and the elbow method.
+    Predicts the number of clusters for a dataset using the silhouette method and the elbow method.
     Takes data and corresponding labels as parameters
+    Returns the number of clusters and the best performing model
     """
     def cluster_and_model(X, y):
         print("finding clusters")
         sse_list = []
         max_silhouette = -1
+        #Performs both Elbow and silhouette methods in the same loop since bpth make use of KMeans in a similar way
         for k in range(2, 15):
             mmodel = KMeans(n_clusters=k).fit(X)
             sse_list.append(mmodel.inertia_)
@@ -50,9 +52,10 @@ class Utils:
                 max_silhouette = s_score
                 max_silhouette_index = k
         plt.plot(list(range(2, 15)), sse_list, '.-')
+        #Show plot to user for manual determination of clusters according to Elbow method
         plt.show()
         input_cluster = int(input("Silhouette predicted %d clusters. Please enter elbow results:\n" %max_silhouette_index))
-        #Find out what value is most accurate if user enters another value for elbow method than silhouete generated
+        #Find out what value is most accurate if user enters another value for elbow method than silhouette generated
         models = []
         scores = []
         if input_cluster <= max_silhouette_index:
@@ -93,6 +96,7 @@ class Utils:
         
     """
     Retrieves a classifier, features and labels to perform cross-validation and display results
+    Also returns F1-Sore as this is used for plotting later
     """
     def evaluatePerformance(clf, features, labels):
         a = cross_val_score(clf, features, labels, cv=10, scoring='accuracy')
